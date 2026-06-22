@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>欲望测试 · 订单管理（小昭后台）</title>
+  <style>
+    :root { --xhs:#ff2e4d; --ink:#2b2230; --soft:#6f6677; --line:#eee; --bg:#f6f3f5; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+    .wrap { max-width:760px; margin:0 auto; padding:24px 16px 60px; }
+    h1 { font-size:22px; margin:0 0 4px; }
+    .sub { color:var(--soft); font-size:13px; margin-bottom:20px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:16px; box-shadow:0 6px 18px rgba(0,0,0,.04); }
+    .card h2 { font-size:15px; margin:0 0 6px; }
+    .card p.hint { color:var(--soft); font-size:12.5px; margin:0 0 12px; }
+    label { font-size:13px; font-weight:600; display:block; margin-bottom:6px; }
+    input, textarea { width:100%; border:1.5px solid #e4dde1; border-radius:10px; padding:11px 12px; font-size:14px; font-family:inherit; }
+    input:focus, textarea:focus { outline:none; border-color:var(--xhs); }
+    textarea { min-height:120px; resize:vertical; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+    .row > div { flex:1; min-width:120px; }
+    button { background:var(--xhs); color:#fff; border:none; border-radius:10px; padding:11px 18px; font-size:14px; font-weight:700; cursor:pointer; }
+    button.ghost { background:#fff; color:var(--xhs); border:1.5px solid #ffd9df; }
+    button:active { transform:scale(.98); }
+    .msg { font-size:13px; margin-top:10px; min-height:18px; }
+    .msg.ok { color:#1aa179; } .msg.err { color:var(--xhs); }
+    .stat { display:flex; gap:18px; margin-bottom:12px; }
+    .stat b { font-size:24px; color:var(--xhs); display:block; }
+    .stat span { font-size:12px; color:var(--soft); }
+    table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    th,td { text-align:left; padding:8px 6px; border-bottom:1px solid #f1ecef; }
+    th { color:var(--soft); font-weight:600; }
+    .tag { font-size:11px; padding:2px 7px; border-radius:999px; }
+    .tag.used { background:#fff0f2; color:var(--xhs); } .tag.free { background:#eafaf3; color:#1aa179; } .tag.rev { background:#eee; color:#999; }
+    .codebox { background:#faf7f9; border:1px dashed #e4dde1; border-radius:10px; padding:12px; font-family:ui-monospace,monospace; font-size:13px; white-space:pre-wrap; word-break:break-all; margin-top:10px; max-height:220px; overflow:auto; }
+    .auth-bar { display:flex; gap:10px; align-items:flex-end; }
+    .pill { font-size:11px; color:var(--soft); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎛️ 订单管理后台</h1>
+    <p class="sub">小昭专用。在这里录入订单号 / 生成解锁码，买家就能自动验证解锁。口令只存在本机浏览器，不会上传。</p>
+
+    <div class="card">
+      <h2>① 管理口令</h2>
+      <p class="hint">填入你在服务器设置的 <code>ADMIN_TOKEN</code>。填对后下面的功能才可用。</p>
+      <div class="auth-bar">
+        <div style="flex:1"><input id="token" type="password" placeholder="ADMIN_TOKEN" /></div>
+        <button id="saveToken">记住口令</button>
+      </div>
+      <div class="msg" id="authMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>② 批量录入订单号（发货对接）</h2>
+      <p class="hint">把小红书后台<b>导出/复制的订单号</b>粘进来，一行一个（也支持逗号、空格分隔）。录入后，买家输入对应订单号即可自动解锁。</p>
+      <textarea id="codes" placeholder="例如：&#10;P20260622001&#10;P20260622002&#10;P20260622003"></textarea>
+      <div style="margin-top:10px"><button id="addBtn">录入</button></div>
+      <div class="msg" id="addMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>③ 生成解锁码（贴进商品自动回复）</h2>
+      <p class="hint">不想用真实订单号时，可一次生成若干随机解锁码，贴到商品/自动回复里发给买家。</p>
+      <div class="row">
+        <div><label>数量</label><input id="genCount" type="number" value="10" min="1" max="500" /></div>
+        <div><label>前缀（可选）</label><input id="genPrefix" placeholder="如 ZHAO-" /></div>
+        <div style="flex:0"><button id="genBtn">生成</button></div>
+      </div>
+      <div class="msg" id="genMsg"></div>
+      <div class="codebox" id="genOut" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <h2>④ 订单 / 解锁码总览</h2>
+      <div class="row" style="margin-bottom:12px">
+        <div style="flex:0"><button class="ghost" id="refreshBtn">刷新</button></div>
+        <div class="pill" id="updatedAt"></div>
+      </div>
+      <div class="stat">
+        <div><b id="stTotal">-</b><span>总数</span></div>
+        <div><b id="stUsed">-</b><span>已使用</span></div>
+        <div><b id="stFree">-</b><span>未使用</span></div>
+      </div>
+      <table>
+        <thead><tr><th>订单号 / 码</th><th>状态</th><th>设备</th><th>操作</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="4" style="color:#aaa">填入口令后点「刷新」加载</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const KEY = "yw_admin_token";
+    $("#token").value = localStorage.getItem(KEY) || "";
+    const tok = () => $("#token").value.trim();
+    async function api(path, opts = {}) {
+      const r = await fetch(path, { ...opts, headers: { "Content-Type": "application/json", "x-admin-token": tok(), ...(opts.headers || {}) } });
+      return r.json().catch(() => ({ ok: false, message: "返回异常" }));
+    }
+    function setMsg(el, text, ok) { el.textContent = text; el.className = "msg " + (ok ? "ok" : "err"); }
+
+    $("#saveToken").onclick = async () => {
+      localStorage.setItem(KEY, tok());
+      const r = await api("/api/admin/list");
+      setMsg($("#authMsg"), r.ok ? "口令有效，已记住 ✅" : "口令不正确或服务未配置 ADMIN_TOKEN ❌", r.ok);
+      if (r.ok) load();
+    };
+    $("#addBtn").onclick = async () => {
+      const codes = $("#codes").value;
+      if (!codes.trim()) return setMsg($("#addMsg"), "请先粘贴订单号", false);
+      const r = await api("/api/admin/add", { method: "POST", body: JSON.stringify({ codes }) });
+      if (r.ok) { setMsg($("#addMsg"), `成功录入 ${r.added} 个（重复 ${r.duplicated} 个），当前共 ${r.total} 个`, true); $("#codes").value = ""; load(); }
+      else setMsg($("#addMsg"), r.message || "录入失败", false);
+    };
+    $("#genBtn").onclick = async () => {
+      const r = await api("/api/admin/generate", { method: "POST", body: JSON.stringify({ count: +$("#genCount").value, prefix: $("#genPrefix").value }) });
+      if (r.ok) {
+        setMsg($("#genMsg"), `已生成 ${r.codes.length} 个，记得复制保存：`, true);
+        $("#genOut").style.display = "block"; $("#genOut").textContent = r.codes.join("\n");
+        load();
+      } else setMsg($("#genMsg"), r.message || "生成失败", false);
+    };
+    $("#refreshBtn").onclick = load;
+    async function load() {
+      const r = await api("/api/admin/list");
+      if (!r.ok) { $("#rows").innerHTML = `<tr><td colspan="4" style="color:#c00">${r.message || "加载失败"}</td></tr>`; return; }
+      $("#stTotal").textContent = r.total; $("#stUsed").textContent = r.used; $("#stFree").textContent = r.unused;
+      $("#updatedAt").textContent = "更新于 " + new Date().toLocaleTimeString();
+      $("#rows").innerHTML = r.codes.map((c) => {
+        const tag = c.revoked ? '<span class="tag rev">已作废</span>'
+          : c.used ? '<span class="tag used">已使用</span>' : '<span class="tag free">未使用</span>';
+        const op = c.revoked ? "" : `<button class="ghost" style="padding:4px 10px;font-size:12px" onclick="revoke('${c.code}')">作废</button>`;
+        return `<tr><td>${c.code}</td><td>${tag}</td><td>${c.devices}</td><td>${op}</td></tr>`;
+      }).join("") || '<tr><td colspan="4" style="color:#aaa">还没有任何订单号</td></tr>';
+    }
+    window.revoke = async (code) => {
+      if (!confirm("确定作废 " + code + " 吗？作废后该编号将无法解锁。")) return;
+      const r = await api("/api/admin/revoke", { method: "POST", body: JSON.stringify({ code }) });
+      if (r.ok) load();
+    };
+    if (tok()) load();
+  </script>
+</body>
+</html>

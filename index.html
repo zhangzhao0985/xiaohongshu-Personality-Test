@@ -7,7 +7,6 @@
   <title>你的什么欲望最强 · 专属欲望档案</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E%F0%9F%92%97%3C/text%3E%3C/svg%3E" />
   <meta name="description" content="20 道情境测试，从 5 大维度精准分析你的欲望强度，生成一份只属于你的《欲望档案》。" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -19,16 +18,11 @@
       <div class="home-inner">
         <div class="badge-row">
           <span class="badge badge-hot">🔥 限时折扣</span>
-          <span class="badge badge-soft">心理测试 · 小昭出品</span>
+          <span class="badge badge-soft">心理测试</span>
         </div>
 
-        <h1 class="home-title">
-          你的<span class="hl">什么欲望</span><br />最强？
-        </h1>
-        <p class="home-sub">
-          每个人心里都住着几种“想要”。<br />
-          它们安静地推着你做选择，却很少被你看清。
-        </p>
+        <h1 class="home-title">你的<span class="hl">什么欲望</span><br />最强？</h1>
+        <p class="home-sub">每个人心里都住着几种“想要”。<br />它们安静地推着你做选择，却很少被你看清。</p>
 
         <div class="orb-wrap" aria-hidden="true">
           <div class="orb orb-love">爱欲</div>
@@ -38,7 +32,7 @@
           <div class="orb orb-core">？</div>
         </div>
 
-        <ul class="value-list" id="valueList"><!-- JS 注入 --></ul>
+        <ul class="value-list" id="valueList"></ul>
 
         <div class="price-card">
           <div class="price-left">
@@ -52,10 +46,33 @@
         </div>
 
         <button class="btn btn-primary btn-lg" id="startBtn">开始测试 · 20 题 →</button>
-        <p class="home-foot">
-          约 2 分钟 · 答案没有对错 · 凭直觉选最像你的那个
-        </p>
-        <button class="link-quiet" id="homeShopLink">已经下单？点这里输入订单编号 →</button>
+        <p class="home-foot">约 2 分钟 · 答案没有对错 · 凭直觉选最像你的那个</p>
+      </div>
+    </section>
+
+    <!-- ================= 验证门（先验证订单编号才能进测试）================= -->
+    <section id="gate" class="screen">
+      <header class="quiz-top">
+        <button class="icon-btn" id="gateBack" aria-label="返回">←</button>
+        <div class="gate-top-title">解锁你的专属测试</div>
+        <div style="width:38px"></div>
+      </header>
+      <div class="gate-body">
+        <div class="gate-lock">🔒</div>
+        <h2 class="gate-title">输入订单编号，开启测试</h2>
+        <p class="gate-sub">这是一份付费测试。下单后把订单编号填在这里，验证通过即可开始你的《欲望档案》。</p>
+
+        <div class="gate-card">
+          <input id="orderInput" class="unlock-input" inputmode="latin" autocomplete="off" placeholder="在此输入订单编号 / 解锁码" />
+          <button class="btn btn-primary btn-block" id="verifyBtn">验证并开始测试</button>
+          <p class="unlock-msg" id="verifyMsg"></p>
+          <button class="link-quiet" id="howToOrder">还没有订单编号？点这里了解 →</button>
+        </div>
+
+        <div class="gate-recap">
+          <div class="recap-price"><span>原价 <s id="priceOld2">¥3</s></span><b>限时 ¥<span id="priceNow2">1.49</span></b></div>
+          <ul class="recap-list" id="recapList"></ul>
+        </div>
       </div>
     </section>
 
@@ -63,94 +80,64 @@
     <section id="quiz" class="screen">
       <header class="quiz-top">
         <button class="icon-btn" id="quizBack" aria-label="返回">←</button>
-        <div class="progress">
-          <div class="progress-bar" id="progressBar"></div>
-        </div>
+        <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
         <div class="progress-count"><span id="qIndex">1</span>/<span id="qTotal">20</span></div>
       </header>
-
       <div class="quiz-body">
         <div class="q-deco" id="qDeco">Q1</div>
         <h2 class="q-title" id="qTitle">题目加载中…</h2>
-        <div class="q-options" id="qOptions"><!-- JS 注入 --></div>
+        <div class="q-options" id="qOptions"></div>
       </div>
     </section>
 
     <!-- ================= 结果 ================= -->
     <section id="result" class="screen">
-      <div class="result-scroll">
-
-        <!-- 免费可见：钩子 -->
-        <div class="result-hero" id="resultHero">
+      <div class="result-scroll" id="resultScroll">
+        <div class="result-hero">
           <p class="result-eyebrow">你的《欲望档案》已生成</p>
           <div class="result-emoji" id="domEmoji">💗</div>
-          <h2 class="result-dom">
-            你的最强欲望是<br /><span class="result-dom-name" id="domName">爱欲</span>
-          </h2>
+          <h2 class="result-dom">你的最强欲望是<br /><span class="result-dom-name" id="domName">爱欲</span></h2>
           <p class="result-teaser" id="domTeaser">……</p>
         </div>
 
-        <!-- 锁定：完整档案 -->
-        <div class="locked-wrap" id="lockedWrap">
-          <div class="locked-content" id="lockedContent" aria-hidden="true">
-            <!-- 欲望分布 -->
-            <div class="card">
-              <h3 class="card-h">🧬 你的欲望光谱</h3>
-              <div class="bars" id="bars"></div>
-            </div>
-            <!-- 主导欲望详解 -->
-            <div class="card" id="domCard">
-              <h3 class="card-h" id="domCardH">关于你的「爱欲」</h3>
-              <p class="card-p" id="domDesc"></p>
-              <div class="trait-chips" id="domTraits"></div>
-            </div>
-            <!-- 隐藏欲望 / 第二欲望 -->
-            <div class="card card-hidden" id="hiddenCard">
-              <h3 class="card-h" id="hiddenH">🫣 你的隐藏面</h3>
-              <p class="card-p" id="hiddenDesc"></p>
-            </div>
-            <!-- 想我指数 -->
-            <div class="card card-miss" id="missCard">
-              <h3 class="card-h">💌 想我指数</h3>
-              <div class="miss-meter"><div class="miss-fill" id="missFill"></div></div>
-              <div class="miss-num"><span id="missNum">0</span>%</div>
-              <p class="card-p" id="missLine"></p>
-            </div>
-            <!-- 小昭寄语 -->
-            <div class="card card-note">
-              <h3 class="card-h">🌷 小昭想对你说</h3>
-              <p class="card-p" id="zhaoNote"></p>
-            </div>
+        <div class="result-cards" id="resultCards">
+          <div class="card">
+            <h3 class="card-h">🧬 你的欲望光谱</h3>
+            <div class="bars" id="bars"></div>
           </div>
-
-          <!-- 锁遮罩 -->
-          <div class="lock-overlay" id="lockOverlay">
-            <div class="lock-glass">
-              <div class="lock-icon">🔒</div>
-              <h3 class="lock-title">完整档案已为你封存</h3>
-              <p class="lock-sub">输入订单编号，解锁你的欲望光谱、隐藏面、想我指数与小昭的寄语。</p>
-              <div class="unlock-form">
-                <input id="orderInput" class="unlock-input" inputmode="latin" autocomplete="off"
-                       placeholder="在此输入订单编号 / 解锁码" />
-                <button class="btn btn-primary" id="unlockBtn">解锁完整档案</button>
-              </div>
-              <p class="unlock-msg" id="unlockMsg"></p>
-              <button class="link-quiet" id="howToOrder">如何获取订单编号？点这里 →</button>
-            </div>
+          <div class="card">
+            <h3 class="card-h" id="domCardH">关于你的「爱欲」</h3>
+            <p class="card-p" id="domDesc"></p>
+            <div class="trait-chips" id="domTraits"></div>
+          </div>
+          <div class="card card-hidden" id="hiddenCard">
+            <h3 class="card-h" id="hiddenH">🫣 你的隐藏面</h3>
+            <p class="card-p" id="hiddenDesc"></p>
+            <div class="trait-chips" id="hiddenTraits"></div>
+          </div>
+          <div class="card card-miss">
+            <h3 class="card-h">💌 想我指数</h3>
+            <div class="miss-meter"><div class="miss-fill" id="missFill"></div></div>
+            <div class="miss-num"><span id="missNum">0</span>%</div>
+            <p class="card-p" id="missLine"></p>
+          </div>
+          <div class="card card-note">
+            <h3 class="card-h">🌷 小昭想对你说</h3>
+            <p class="card-p" id="zhaoNote"></p>
           </div>
         </div>
 
-        <div class="result-actions" id="resultActions">
+        <div class="result-actions">
           <button class="btn btn-ghost" id="retakeBtn">重新测试</button>
-          <button class="btn btn-soft" id="shareBtn">截图分享给朋友</button>
+          <button class="btn btn-primary" id="shareBtn">一键生成分享长图</button>
         </div>
         <div class="result-foot">小昭 · 持续创作中 🌿</div>
       </div>
     </section>
 
-    <!-- ================= 弹窗：主题抽奖通知（购买引导） ================= -->
+    <!-- ================= 弹窗：主题抽奖通知（购买引导）================= -->
     <div class="modal-mask" id="shopModal">
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shopModalTitle">
+      <div class="modal" role="dialog" aria-modal="true">
         <button class="modal-close" id="shopModalClose" aria-label="关闭">×</button>
         <div class="modal-ribbon">📣 主题抽奖通知</div>
         <div class="modal-body">
@@ -168,17 +155,28 @@
       </div>
     </div>
 
-    <!-- ================= 弹窗：解锁成功 ================= -->
+    <!-- ================= 弹窗：验证成功 ================= -->
     <div class="modal-mask" id="okModal">
       <div class="modal modal-celebrate" role="dialog" aria-modal="true">
         <div class="confetti" id="confetti"></div>
         <div class="ok-emoji">🎉</div>
-        <h3 class="ok-title">验证成功，完整档案已解锁！</h3>
-        <p class="ok-sub">谢谢你愿意走到这里。<br />往下滑，看看你藏起来的那些“想要”——也看看小昭想对你说的话。</p>
-        <button class="btn btn-primary btn-block" id="okModalBtn">查看我的完整档案 ↓</button>
+        <h3 class="ok-title">验证成功！</h3>
+        <p class="ok-sub">谢谢你愿意走到这里。<br />深呼吸，跟着直觉答完 20 题——看看你心里最强的那股“想要”，到底是什么。</p>
+        <button class="btn btn-primary btn-block" id="okModalBtn">开始测试 →</button>
       </div>
     </div>
 
+    <!-- ================= 弹窗：分享长图 ================= -->
+    <div class="modal-mask" id="shareModal">
+      <div class="modal modal-share" role="dialog" aria-modal="true">
+        <button class="modal-close" id="shareModalClose" aria-label="关闭">×</button>
+        <h3 class="share-title">长按图片保存，分享到小红书 📸</h3>
+        <div class="share-img-wrap"><img id="shareImg" alt="我的欲望档案" /></div>
+        <a class="btn btn-primary btn-block" id="shareDownload" download="我的欲望档案.png">保存到相册 / 下载</a>
+      </div>
+    </div>
+
+    <canvas id="posterCanvas" width="750" height="1334" style="display:none"></canvas>
   </div>
 
   <script src="app.js"></script>

@@ -268,6 +268,39 @@ body {
 .confetti i { position: absolute; top: -12px; width: 8px; height: 13px; border-radius: 2px; opacity: .9; animation: fall linear forwards; }
 @keyframes fall { to { transform: translateY(460px) rotate(540deg); opacity: 0; } }
 
+/* =========================================================================
+   验证门
+   ========================================================================= */
+#gate { background: linear-gradient(180deg,#fff5f6,#fff 45%); }
+.gate-top-title { flex: 1; text-align: center; font-size: 15px; font-weight: 700; color: var(--ink); }
+.gate-body { padding: 14px 24px 40px; text-align: center; }
+.gate-lock { font-size: 50px; margin: 18px 0 6px; }
+.gate-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+.gate-sub { color: var(--ink-soft); font-size: 14px; margin-bottom: 22px; padding: 0 6px; }
+.gate-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 18px; box-shadow: var(--shadow); text-align: center; }
+.gate-card .unlock-input { margin-bottom: 12px; }
+.gate-card .btn { margin-bottom: 4px; }
+.gate-recap { margin-top: 24px; background: #fff8f4; border: 1px solid #ffe6d6; border-radius: 18px; padding: 16px 18px; text-align: left; }
+.recap-price { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.recap-price s { color: var(--ink-soft); font-size: 13px; }
+.recap-price b { color: var(--xhs); font-size: 22px; font-weight: 900; }
+.recap-list { list-style: none; display: grid; gap: 7px; }
+.recap-list li { font-size: 13.5px; color: #5a5360; }
+
+/* =========================================================================
+   结果卡片容器（验证已前置，结果默认全部可见）
+   ========================================================================= */
+.result-cards { display: grid; gap: 14px; }
+
+/* =========================================================================
+   分享长图弹窗
+   ========================================================================= */
+.modal-share { padding: 22px 18px 18px; }
+.share-title { text-align: center; font-size: 16px; font-weight: 800; margin-bottom: 14px; }
+.share-img-wrap { border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft); margin-bottom: 16px; max-height: 56vh; overflow-y: auto; }
+.share-img-wrap img { width: 100%; display: block; }
+#shareDownload { text-decoration: none; text-align: center; }
+
 @media (max-width: 360px) {
   .home-title { font-size: 34px; }
   .q-title { font-size: 21px; }
