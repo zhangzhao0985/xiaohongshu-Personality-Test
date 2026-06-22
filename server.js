@@ -188,7 +188,7 @@ const server = http.createServer(async (req, res) => {
     const known = rec.devices.includes(deviceId);
     if (!known) {
       if (rec.devices.length >= CFG.MAX_DEVICES_PER_CODE) {
-        return sendJSON(res, 200, { ok: false, reason: "used", message: "这个订单编号已在其它设备使用过啦，如有疑问请联系小昭" });
+        return sendJSON(res, 200, { ok: false, reason: "used", message: "这个订单编号已在其它设备使用过啦，如有疑问请联系小叭" });
       }
       rec.devices.push(deviceId);
       rec.used = true;

@@ -1,0 +1,27 @@
+# systemd 服务单元：开机自启 + 崩溃自动重启
+# 用法：复制到 /etc/systemd/system/yuwang-test.service，按需修改下面的路径/用户/环境变量，
+#       然后 sudo systemctl daemon-reload && sudo systemctl enable --now yuwang-test
+
+[Unit]
+Description=Yuwang Test (xiaohongshu personality test)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/yuwang-test
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+User=www-data
+
+# —— 环境变量（请改成你自己的）——
+Environment=NODE_ENV=production
+Environment=PORT=8787
+Environment=ADMIN_TOKEN=请改成只有你知道的一长串口令
+Environment=TOKEN_SECRET=请改成另一串随机字符
+Environment=ALLOW_ORIGIN=https://你的域名
+Environment=MAX_DEVICES_PER_CODE=2
+Environment=TOKEN_TTL_DAYS=30
+
+[Install]
+WantedBy=multi-user.target

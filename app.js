@@ -1,27 +1,28 @@
 /* =========================================================================
    你的什么欲望最强 · 前端
    —— 题目和计分都在后端，这里只负责界面、验证、答题、出结果、生成分享图。
-   —— 小昭你好：这一块 CONFIG 是前端唯一要改的（店铺名/链接/价格/后端地址）。
+   —— 小叭你好：这一块 CONFIG 是前端唯一要改的（店铺名/链接/后端地址/备案号）。
    ========================================================================= */
 
 const CONFIG = {
-  SHOP_NAME: "待补充",   // 你的小红书店铺名，例如 "小昭的杂货铺"
+  SHOP_NAME: "待补充",   // 你的小红书店铺名，例如 "小叭的杂货铺"
   SHOP_URL: "",          // 可留空；填了会在弹窗里出现「前往店铺 →」按钮
-  PRICE_NOW: "1.49",
-  PRICE_OLD: "¥3",
   // 后端地址。若前后端同一个服务（推荐），留空即可；分开部署时填后端域名，如 "https://api.xxx.com"
   API_BASE: "",
+  // 大陆备案上线后，把工信部 ICP 备案号填这里，会显示在首页底部（大陆网站合规要求）。
+  // 例如 "粤ICP备12345678号-1"
+  ICP_BEIAN: "",
 };
 
 const VALUE_POINTS = [
   { i: "🎯", t: "精准 · 5 维欲望测评", s: "20 道情境题，量化你 5 大欲望的真实强度" },
   { i: "📑", t: "专属 · 你的《欲望档案》", s: "主导欲望 + 隐藏面 + 想我指数，一份只属于你" },
   { i: "✨", t: "彩蛋 · 一个隐藏维度", s: "大多数人都测不出来的第 5 种欲望，你会触发它吗？" },
-  { i: "💌", t: "治愈 · 小昭的悄悄话", s: "每一份结果里，都藏着小昭单独想对你说的一句话" },
+  { i: "💌", t: "治愈 · 小叭的悄悄话", s: "每一份结果里，都藏着小叭单独想对你说的一句话" },
 ];
 
 /* ---------- 状态 ---------- */
-const LS = { device: "yw_device", token: "yw_token", welcomed: "yw_welcomed" };
+const LS = { device: "yw_device", token: "yw_token" };
 let quiz = null;       // { total, questions:[{id,q,options:[{id,t}]}] }
 let answers = {};      // qi -> optionId
 let cur = 0;
@@ -55,13 +56,6 @@ async function api(path, { method = "GET", body, auth = false } = {}) {
    初始化
    ========================================================================= */
 function init() {
-  $("#priceNow").textContent = CONFIG.PRICE_NOW;
-  $("#priceOld").textContent = CONFIG.PRICE_OLD;
-  $("#priceNow2").textContent = CONFIG.PRICE_NOW;
-  $("#priceOld2").textContent = CONFIG.PRICE_OLD;
-  const save = (parseFloat(CONFIG.PRICE_OLD.replace(/[^\d.]/g, "")) - parseFloat(CONFIG.PRICE_NOW)).toFixed(2);
-  $("#priceTag").textContent = isNaN(save) ? "限时折扣" : `立省 ¥${save}`;
-
   $("#shopNameText").textContent = CONFIG.SHOP_NAME || "待补充";
   if (CONFIG.SHOP_URL) { const a = $("#shopGoLink"); a.href = CONFIG.SHOP_URL; a.hidden = false; }
 
@@ -69,13 +63,15 @@ function init() {
     `<li><span class="vi">${v.i}</span><div><b>${v.t}</b><span class="vt">${v.s}</span></div></li>`).join("");
   $("#recapList").innerHTML = VALUE_POINTS.map((v) => `<li>${v.i} ${v.t.replace(/^.+ · /, "")}</li>`).join("");
 
+  if (CONFIG.ICP_BEIAN) {
+    $("#siteBeian").innerHTML = `<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">${CONFIG.ICP_BEIAN}</a>`;
+  }
+
   deviceId();
   bindEvents();
 
-  if (!localStorage.getItem(LS.welcomed) && !getToken()) {
-    setTimeout(() => openModal("#shopModal"), 650);
-    localStorage.setItem(LS.welcomed, "1");
-  }
+  // 打开网页即弹出「解锁您的专属测试」弹窗
+  setTimeout(() => openModal("#shopModal"), 600);
 }
 
 function bindEvents() {
@@ -339,7 +335,7 @@ function drawPoster(r) {
   ctx.fillStyle = "#b09aa3"; ctx.font = '500 26px "PingFang SC",sans-serif';
   ctx.fillText("你的什么欲望最强 · 20 道题测出你的专属档案", cx, 1240);
   ctx.fillStyle = "#ff2e4d"; ctx.font = '800 30px "PingFang SC",sans-serif';
-  ctx.fillText("👀 来小红书找小昭，测测你的", cx, 1285);
+  ctx.fillText("👀 来小红书找小叭，测测你的", cx, 1285);
 }
 
 /* =========================================================================

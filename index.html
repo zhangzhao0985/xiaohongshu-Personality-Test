@@ -34,19 +34,9 @@
 
         <ul class="value-list" id="valueList"></ul>
 
-        <div class="price-card">
-          <div class="price-left">
-            <div class="price-now"><span class="cur">¥</span><span id="priceNow">1.49</span></div>
-            <div class="price-old">原价 <s id="priceOld">¥3</s></div>
-          </div>
-          <div class="price-right">
-            <div class="price-tag" id="priceTag">立省 ¥1.51</div>
-            <div class="price-note">一杯奶茶的零头，换一份看清自己</div>
-          </div>
-        </div>
-
         <button class="btn btn-primary btn-lg" id="startBtn">开始测试 · 20 题 →</button>
         <p class="home-foot">约 2 分钟 · 答案没有对错 · 凭直觉选最像你的那个</p>
+        <p class="site-beian" id="siteBeian"></p>
       </div>
     </section>
 
@@ -60,7 +50,7 @@
       <div class="gate-body">
         <div class="gate-lock">🔒</div>
         <h2 class="gate-title">输入订单编号，开启测试</h2>
-        <p class="gate-sub">这是一份付费测试。下单后把订单编号填在这里，验证通过即可开始你的《欲望档案》。</p>
+        <p class="gate-sub">下单后把订单编号填在这里，验证通过即可开始你的《欲望档案》。</p>
 
         <div class="gate-card">
           <input id="orderInput" class="unlock-input" inputmode="latin" autocomplete="off" placeholder="在此输入订单编号 / 解锁码" />
@@ -70,7 +60,7 @@
         </div>
 
         <div class="gate-recap">
-          <div class="recap-price"><span>原价 <s id="priceOld2">¥3</s></span><b>限时 ¥<span id="priceNow2">1.49</span></b></div>
+          <p class="recap-title">验证后你将解锁 👇</p>
           <ul class="recap-list" id="recapList"></ul>
         </div>
       </div>
@@ -122,7 +112,7 @@
             <p class="card-p" id="missLine"></p>
           </div>
           <div class="card card-note">
-            <h3 class="card-h">🌷 小昭想对你说</h3>
+            <h3 class="card-h">🌷 小叭想对你说</h3>
             <p class="card-p" id="zhaoNote"></p>
           </div>
         </div>
@@ -131,25 +121,25 @@
           <button class="btn btn-ghost" id="retakeBtn">重新测试</button>
           <button class="btn btn-primary" id="shareBtn">一键生成分享长图</button>
         </div>
-        <div class="result-foot">小昭 · 持续创作中 🌿</div>
+        <div class="result-foot">小叭 · 持续创作中 🌿</div>
       </div>
     </section>
 
-    <!-- ================= 弹窗：主题抽奖通知（购买引导）================= -->
+    <!-- ================= 弹窗：解锁您的专属测试（购买/解锁引导）================= -->
     <div class="modal-mask" id="shopModal">
       <div class="modal" role="dialog" aria-modal="true">
         <button class="modal-close" id="shopModalClose" aria-label="关闭">×</button>
-        <div class="modal-ribbon">📣 主题抽奖通知</div>
+        <div class="modal-ribbon">🔓 解锁您的专属测试</div>
         <div class="modal-body">
-          <p class="modal-greet">hi，我是<b>小昭</b> ～</p>
+          <p class="modal-greet">hi，我是<b>小叭</b> ～</p>
           <p>这个心理测试的初衷，是希望你在测试结果里，看到一点<b>“好像真的有点想我”</b>的感觉。</p>
-          <p>如果你想查看<b>完整结果</b>，可以前往我的<b>【小红书店铺下单获取订单编号】</b>。下单后，把订单编号填写在页面里，就可以解锁完整内容啦~</p>
+          <p>这是一份<b>付费测试</b>。如果你已经在我的小红书店铺下单，把<b>订单编号</b>填到页面里，就能立刻解锁完整内容啦~</p>
           <div class="shop-line">
             🛍️ 我的小红书店铺：<b id="shopNameText">待补充</b>
             <a class="shop-go" id="shopGoLink" href="#" target="_blank" rel="noopener" hidden>前往店铺 →</a>
           </div>
-          <p class="modal-soft">我会持续创作，慢慢把更多有意思的小测试、小心事都放进来。</p>
-          <p class="modal-thanks">谢谢你愿意花一点点时间，认识自己，也顺便认识我。🌷<br /><span class="sign">—— 小昭</span></p>
+          <p class="modal-soft">还没下单也没关系，先去店铺拍下，拿到订单编号再回来就好。我会持续创作，慢慢把更多有意思的小测试、小心事都放进来。</p>
+          <p class="modal-thanks">谢谢你愿意花一点点时间，认识自己，也顺便认识我。🌷<br /><span class="sign">—— 小叭</span></p>
         </div>
         <button class="btn btn-primary btn-block" id="shopModalOk">我知道啦，去填订单编号</button>
       </div>
