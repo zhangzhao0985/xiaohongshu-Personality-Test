@@ -17,6 +17,27 @@ const path = require("path");
 const { getClientQuiz, computeResult } = require("./content");
 
 const ROOT = __dirname;
+
+// 自动读取项目根目录下的 .env 文件（若存在）。
+// 这样设置口令 = 直接编辑 .env 这个文本文件即可，不用懂环境变量。
+// 注意：系统真正注入的环境变量（systemd / Docker）优先级更高，不会被覆盖。
+(function loadDotEnv() {
+  try {
+    const txt = fs.readFileSync(path.join(ROOT, ".env"), "utf8");
+    txt.split(/\r?\n/).forEach((line) => {
+      const s = line.trim();
+      if (!s || s.startsWith("#")) return;
+      const eq = s.indexOf("=");
+      if (eq === -1) return;
+      const k = s.slice(0, eq).trim();
+      let v = s.slice(eq + 1).trim();
+      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1);
+      if (k && process.env[k] === undefined) process.env[k] = v;
+    });
+    console.log("📄 已读取 .env 配置");
+  } catch (_) { /* 没有 .env 就忽略，用系统环境变量 */ }
+})();
+
 const DATA_DIR = path.join(ROOT, "data");
 const DB_FILE = path.join(DATA_DIR, "orders.json");
 const SECRET_FILE = path.join(DATA_DIR, ".secret");
