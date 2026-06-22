@@ -15,9 +15,9 @@ const CONFIG = {
 };
 
 const VALUE_POINTS = [
-  { i: "🎯", t: "精准 · 5 维欲望测评", s: "20 道情境题，量化你 5 大欲望的真实强度" },
-  { i: "📑", t: "专属 · 你的《欲望档案》", s: "主导欲望 + 隐藏面 + 想我指数，一份只属于你" },
-  { i: "✨", t: "彩蛋 · 一个隐藏维度", s: "大多数人都测不出来的第 5 种欲望，你会触发它吗？" },
+  { i: "🎯", t: "精准 · 8 维欲望测评", s: "20 道情境题，量化你 8 大欲望的真实强度" },
+  { i: "🧬", t: "专属 · 你的人格属性", s: "8 种属性看看你是哪一种，附一句话概述 + 完整深度分析" },
+  { i: "📊", t: "可视化 · 你的欲望光谱", s: "8 大欲望强弱一目了然，带百分比进度条" },
   { i: "💌", t: "治愈 · 小叭的悄悄话", s: "每一份结果里，都藏着小叭单独想对你说的一句话" },
 ];
 
@@ -200,11 +200,11 @@ async function finishQuiz() {
    结果
    ========================================================================= */
 function renderResult(r) {
-  const dom = r.dominant;
-  $("#domEmoji").textContent = dom.emoji;
-  $("#domName").textContent = dom.name;
-  $("#domName").style.color = dom.color;
-  $("#domTeaser").textContent = dom.teaser;
+  const a = r.attribute;
+  $("#domEmoji").textContent = a.emoji;
+  $("#domName").textContent = a.name;
+  $("#domName").style.color = a.color;
+  $("#domTeaser").textContent = a.summary;
 
   $("#bars").innerHTML = r.spectrum.map((d) =>
     `<div class="bar-row">
@@ -213,9 +213,9 @@ function renderResult(r) {
       <span class="bar-val">${d.pct}%</span>
     </div>`).join("");
 
-  $("#domCardH").textContent = `关于你的「${dom.name}」`;
-  $("#domDesc").textContent = dom.desc;
-  $("#domTraits").innerHTML = dom.traits.map((t) => `<span class="chip">${t}</span>`).join("");
+  $("#domCardH").textContent = `完整分析 · 关于你的「${a.name}」`;
+  $("#domDesc").textContent = a.analysis;
+  $("#domTraits").innerHTML = a.traits.map((t) => `<span class="chip">${t}</span>`).join("");
 
   $("#hiddenH").innerHTML = r.hidden.title;
   $("#hiddenDesc").textContent = r.hidden.desc;
@@ -267,51 +267,53 @@ function drawPoster(r) {
   const c = $("#posterCanvas");
   const W = c.width, H = c.height;
   const ctx = c.getContext("2d");
-  const dom = r.dominant;
+  const a = r.attribute;
 
   // 背景
   const bg = ctx.createLinearGradient(0, 0, 0, H);
   bg.addColorStop(0, "#fff0f3"); bg.addColorStop(0.5, "#fff7f3"); bg.addColorStop(1, "#fff");
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = dom.color + "22"; ctx.beginPath(); ctx.arc(W - 80, 120, 180, 0, 7); ctx.fill();
+  ctx.fillStyle = a.color + "22"; ctx.beginPath(); ctx.arc(W - 80, 120, 180, 0, 7); ctx.fill();
   ctx.fillStyle = "#ffd9df55"; ctx.beginPath(); ctx.arc(60, 60, 120, 0, 7); ctx.fill();
 
   const cx = W / 2;
   ctx.textAlign = "center";
   ctx.fillStyle = "#b09aa3";
   ctx.font = '500 26px "PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillText("我 的 欲 望 档 案", cx, 92);
+  ctx.fillText("我 的 欲 望 档 案", cx, 88);
 
-  ctx.font = '900 62px "PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.font = '900 54px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.fillStyle = "#2b2230";
-  ctx.fillText("你的最强欲望是", cx, 190);
+  ctx.fillText("你的属性是", cx, 172);
 
-  ctx.font = "100px sans-serif";
-  ctx.fillText(dom.emoji, cx, 320);
-  ctx.font = '900 90px "PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillStyle = dom.color;
-  ctx.fillText(dom.name, cx, 430);
+  ctx.font = "96px sans-serif";
+  ctx.fillText(a.emoji, cx, 296);
+  ctx.font = '900 84px "PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.fillStyle = a.color;
+  ctx.fillText(a.name, cx, 404);
 
-  // teaser
-  ctx.font = '500 30px "PingFang SC","Microsoft YaHei",sans-serif';
+  // 一句话概述
+  ctx.font = '500 29px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.fillStyle = "#6f6677";
-  wrapText(ctx, dom.teaser, cx, 500, W - 140, 46);
+  wrapText(ctx, a.summary, cx, 470, W - 150, 44);
 
-  // 光谱卡
-  let y = 600;
+  // 光谱卡（展示前 6 个欲望）
+  const top = r.spectrum.slice(0, 6);
+  let y = 580;
+  const cardH = 130 + top.length * 58;
   ctx.textAlign = "left";
   ctx.fillStyle = "#ffffff";
-  roundRect(ctx, 70, y, W - 140, 360, 28); ctx.fill();
+  roundRect(ctx, 70, y, W - 140, cardH, 28); ctx.fill();
   ctx.fillStyle = "#2b2230";
   ctx.font = '800 34px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.fillText("🧬 你的欲望光谱", 110, y + 60);
 
-  let by = y + 110;
-  r.spectrum.forEach((d) => {
+  let by = y + 116;
+  top.forEach((d) => {
     ctx.fillStyle = "#2b2230";
     ctx.font = '700 28px "PingFang SC","Microsoft YaHei",sans-serif';
     ctx.fillText(`${d.emoji} ${d.name}`, 110, by + 8);
-    const tx = 280, tw = W - 140 - (tx - 70) - 90;
+    const tx = 300, tw = W - 140 - (tx - 70) - 90;
     ctx.fillStyle = "#f1ecef"; roundRect(ctx, tx, by - 16, tw, 22, 11); ctx.fill();
     ctx.fillStyle = d.color; roundRect(ctx, tx, by - 16, Math.max(22, tw * d.pct / 100), 22, 11); ctx.fill();
     ctx.fillStyle = "#6f6677"; ctx.textAlign = "right";
@@ -322,20 +324,20 @@ function drawPoster(r) {
   });
 
   // 想我指数
-  y = 1010;
+  y = y + cardH + 36;
   ctx.fillStyle = "#fff0f4"; roundRect(ctx, 70, y, W - 140, 150, 28); ctx.fill();
   ctx.fillStyle = "#2b2230"; ctx.font = '800 32px "PingFang SC",sans-serif';
   ctx.fillText("💌 想我指数", 110, y + 56);
-  ctx.fillStyle = dom.color; ctx.font = '900 64px "PingFang SC",sans-serif';
+  ctx.fillStyle = a.color; ctx.font = '900 64px "PingFang SC",sans-serif';
   ctx.textAlign = "right"; ctx.fillText(r.missIndex + "%", W - 100, y + 100);
   ctx.textAlign = "left";
 
   // 底部
   ctx.textAlign = "center";
   ctx.fillStyle = "#b09aa3"; ctx.font = '500 26px "PingFang SC",sans-serif';
-  ctx.fillText("你的什么欲望最强 · 20 道题测出你的专属档案", cx, 1240);
+  ctx.fillText("你的什么欲望最强 · 20 道题测出你的专属属性", cx, H - 92);
   ctx.fillStyle = "#ff2e4d"; ctx.font = '800 30px "PingFang SC",sans-serif';
-  ctx.fillText("👀 来小红书找小叭，测测你的", cx, 1285);
+  ctx.fillText("👀 来小红书找小叭，测测你的", cx, H - 50);
 }
 
 /* =========================================================================

@@ -190,10 +190,14 @@ body {
 .card-note { background: linear-gradient(135deg,#fffaf0,#fff5f6); border-color: #ffe6c9; }
 .card-note .card-p { white-space: pre-line; }
 
+/* 完整分析卡：长文分段、阅读更舒服 */
+.card-analysis .card-p { white-space: pre-line; line-height: 1.92; font-size: 15px; }
+.card-analysis .card-p + .card-p { margin-top: 10px; }
+
 /* 欲望光谱条 */
 .bars { display: grid; gap: 11px; }
-.bar-row { display: grid; grid-template-columns: 60px 1fr 42px; align-items: center; gap: 10px; font-size: 13.5px; }
-.bar-name { font-weight: 700; }
+.bar-row { display: grid; grid-template-columns: 80px 1fr 42px; align-items: center; gap: 10px; font-size: 13.5px; }
+.bar-name { font-weight: 700; white-space: nowrap; }
 .bar-track { height: 12px; background: #f1ecef; border-radius: 999px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 999px; width: 0; transition: width .9s cubic-bezier(.22,1,.36,1); }
 .bar-val { text-align: right; font-weight: 700; color: var(--ink-soft); }
