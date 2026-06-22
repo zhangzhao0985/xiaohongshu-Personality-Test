@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#ff2e4d" />
+  <title>你的什么欲望最强 · 专属欲望档案</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E%F0%9F%92%97%3C/text%3E%3C/svg%3E" />
+  <meta name="description" content="20 道情境测试，从 5 大维度精准分析你的欲望强度，生成一份只属于你的《欲望档案》。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ================= 首页 ================= -->
+    <section id="home" class="screen is-active">
+      <div class="home-bg"></div>
+      <div class="home-inner">
+        <div class="badge-row">
+          <span class="badge badge-hot">🔥 限时折扣</span>
+          <span class="badge badge-soft">心理测试 · 小昭出品</span>
+        </div>
+
+        <h1 class="home-title">
+          你的<span class="hl">什么欲望</span><br />最强？
+        </h1>
+        <p class="home-sub">
+          每个人心里都住着几种“想要”。<br />
+          它们安静地推着你做选择，却很少被你看清。
+        </p>
+
+        <div class="orb-wrap" aria-hidden="true">
+          <div class="orb orb-love">爱欲</div>
+          <div class="orb orb-thing">物欲</div>
+          <div class="orb orb-food">食欲</div>
+          <div class="orb orb-own">占有欲</div>
+          <div class="orb orb-core">？</div>
+        </div>
+
+        <ul class="value-list" id="valueList"><!-- JS 注入 --></ul>
+
+        <div class="price-card">
+          <div class="price-left">
+            <div class="price-now"><span class="cur">¥</span><span id="priceNow">1.49</span></div>
+            <div class="price-old">原价 <s id="priceOld">¥3</s></div>
+          </div>
+          <div class="price-right">
+            <div class="price-tag" id="priceTag">立省 ¥1.51</div>
+            <div class="price-note">一杯奶茶的零头，换一份看清自己</div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" id="startBtn">开始测试 · 20 题 →</button>
+        <p class="home-foot">
+          约 2 分钟 · 答案没有对错 · 凭直觉选最像你的那个
+        </p>
+        <button class="link-quiet" id="homeShopLink">已经下单？点这里输入订单编号 →</button>
+      </div>
+    </section>
+
+    <!-- ================= 测试 ================= -->
+    <section id="quiz" class="screen">
+      <header class="quiz-top">
+        <button class="icon-btn" id="quizBack" aria-label="返回">←</button>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-count"><span id="qIndex">1</span>/<span id="qTotal">20</span></div>
+      </header>
+
+      <div class="quiz-body">
+        <div class="q-deco" id="qDeco">Q1</div>
+        <h2 class="q-title" id="qTitle">题目加载中…</h2>
+        <div class="q-options" id="qOptions"><!-- JS 注入 --></div>
+      </div>
+    </section>
+
+    <!-- ================= 结果 ================= -->
+    <section id="result" class="screen">
+      <div class="result-scroll">
+
+        <!-- 免费可见：钩子 -->
+        <div class="result-hero" id="resultHero">
+          <p class="result-eyebrow">你的《欲望档案》已生成</p>
+          <div class="result-emoji" id="domEmoji">💗</div>
+          <h2 class="result-dom">
+            你的最强欲望是<br /><span class="result-dom-name" id="domName">爱欲</span>
+          </h2>
+          <p class="result-teaser" id="domTeaser">……</p>
+        </div>
+
+        <!-- 锁定：完整档案 -->
+        <div class="locked-wrap" id="lockedWrap">
+          <div class="locked-content" id="lockedContent" aria-hidden="true">
+            <!-- 欲望分布 -->
+            <div class="card">
+              <h3 class="card-h">🧬 你的欲望光谱</h3>
+              <div class="bars" id="bars"></div>
+            </div>
+            <!-- 主导欲望详解 -->
+            <div class="card" id="domCard">
+              <h3 class="card-h" id="domCardH">关于你的「爱欲」</h3>
+              <p class="card-p" id="domDesc"></p>
+              <div class="trait-chips" id="domTraits"></div>
+            </div>
+            <!-- 隐藏欲望 / 第二欲望 -->
+            <div class="card card-hidden" id="hiddenCard">
+              <h3 class="card-h" id="hiddenH">🫣 你的隐藏面</h3>
+              <p class="card-p" id="hiddenDesc"></p>
+            </div>
+            <!-- 想我指数 -->
+            <div class="card card-miss" id="missCard">
+              <h3 class="card-h">💌 想我指数</h3>
+              <div class="miss-meter"><div class="miss-fill" id="missFill"></div></div>
+              <div class="miss-num"><span id="missNum">0</span>%</div>
+              <p class="card-p" id="missLine"></p>
+            </div>
+            <!-- 小昭寄语 -->
+            <div class="card card-note">
+              <h3 class="card-h">🌷 小昭想对你说</h3>
+              <p class="card-p" id="zhaoNote"></p>
+            </div>
+          </div>
+
+          <!-- 锁遮罩 -->
+          <div class="lock-overlay" id="lockOverlay">
+            <div class="lock-glass">
+              <div class="lock-icon">🔒</div>
+              <h3 class="lock-title">完整档案已为你封存</h3>
+              <p class="lock-sub">输入订单编号，解锁你的欲望光谱、隐藏面、想我指数与小昭的寄语。</p>
+              <div class="unlock-form">
+                <input id="orderInput" class="unlock-input" inputmode="latin" autocomplete="off"
+                       placeholder="在此输入订单编号 / 解锁码" />
+                <button class="btn btn-primary" id="unlockBtn">解锁完整档案</button>
+              </div>
+              <p class="unlock-msg" id="unlockMsg"></p>
+              <button class="link-quiet" id="howToOrder">如何获取订单编号？点这里 →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-actions" id="resultActions">
+          <button class="btn btn-ghost" id="retakeBtn">重新测试</button>
+          <button class="btn btn-soft" id="shareBtn">截图分享给朋友</button>
+        </div>
+        <div class="result-foot">小昭 · 持续创作中 🌿</div>
+      </div>
+    </section>
+
+    <!-- ================= 弹窗：主题抽奖通知（购买引导） ================= -->
+    <div class="modal-mask" id="shopModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shopModalTitle">
+        <button class="modal-close" id="shopModalClose" aria-label="关闭">×</button>
+        <div class="modal-ribbon">📣 主题抽奖通知</div>
+        <div class="modal-body">
+          <p class="modal-greet">hi，我是<b>小昭</b> ～</p>
+          <p>这个心理测试的初衷，是希望你在测试结果里，看到一点<b>“好像真的有点想我”</b>的感觉。</p>
+          <p>如果你想查看<b>完整结果</b>，可以前往我的<b>【小红书店铺下单获取订单编号】</b>。下单后，把订单编号填写在页面里，就可以解锁完整内容啦~</p>
+          <div class="shop-line">
+            🛍️ 我的小红书店铺：<b id="shopNameText">待补充</b>
+            <a class="shop-go" id="shopGoLink" href="#" target="_blank" rel="noopener" hidden>前往店铺 →</a>
+          </div>
+          <p class="modal-soft">我会持续创作，慢慢把更多有意思的小测试、小心事都放进来。</p>
+          <p class="modal-thanks">谢谢你愿意花一点点时间，认识自己，也顺便认识我。🌷<br /><span class="sign">—— 小昭</span></p>
+        </div>
+        <button class="btn btn-primary btn-block" id="shopModalOk">我知道啦，去填订单编号</button>
+      </div>
+    </div>
+
+    <!-- ================= 弹窗：解锁成功 ================= -->
+    <div class="modal-mask" id="okModal">
+      <div class="modal modal-celebrate" role="dialog" aria-modal="true">
+        <div class="confetti" id="confetti"></div>
+        <div class="ok-emoji">🎉</div>
+        <h3 class="ok-title">验证成功，完整档案已解锁！</h3>
+        <p class="ok-sub">谢谢你愿意走到这里。<br />往下滑，看看你藏起来的那些“想要”——也看看小昭想对你说的话。</p>
+        <button class="btn btn-primary btn-block" id="okModalBtn">查看我的完整档案 ↓</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
