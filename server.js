@@ -14,7 +14,7 @@ const http = require("http");
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const { getClientQuiz, computeResult } = require("./content");
+const { getClientQuiz, computeResult } = require("./api/_content");
 
 const ROOT = __dirname;
 
@@ -38,7 +38,9 @@ const ROOT = __dirname;
   } catch (_) { /* 没有 .env 就忽略，用系统环境变量 */ }
 })();
 
-const DATA_DIR = path.join(ROOT, "data");
+// 订单数据存放目录。可用环境变量 DATA_DIR 指定一个固定的绝对路径
+// （部署到托管平台时，把平台的「持久化存储/卷」挂到这个路径，订单数据就不会丢）。
+const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(ROOT, "data");
 const DB_FILE = path.join(DATA_DIR, "orders.json");
 const SECRET_FILE = path.join(DATA_DIR, ".secret");
 
