@@ -221,13 +221,18 @@ function renderResult(r) {
   $("#hiddenDesc").textContent = r.hidden.desc;
   $("#hiddenTraits").innerHTML = (r.hidden.traits || []).map((t) => `<span class="chip">${t}</span>`).join("");
 
-  $("#missNum").textContent = r.missIndex;
-  $("#missLine").textContent = r.missLine;
+  const top = r.topDesire;
+  $("#topEmoji").textContent = top.emoji;
+  $("#topName").textContent = top.name;
+  $("#topPct").textContent = top.pct + "%";
+  $("#topDesc").textContent = top.desc;
   $("#zhaoNote").textContent = r.zhaoNote;
 
   setTimeout(() => {
     $$("#bars .bar-fill").forEach((f) => (f.style.width = f.dataset.w + "%"));
-    $("#missFill").style.width = r.missIndex + "%";
+    const tf = $("#topFill");
+    tf.style.background = top.color;
+    tf.style.width = top.pct + "%";
   }, 140);
 }
 
@@ -323,13 +328,16 @@ function drawPoster(r) {
     by += 58;
   });
 
-  // 想我指数
+  // 你最强烈的欲望
+  const topD = r.topDesire;
   y = y + cardH + 36;
   ctx.fillStyle = "#fff0f4"; roundRect(ctx, 70, y, W - 140, 150, 28); ctx.fill();
   ctx.fillStyle = "#2b2230"; ctx.font = '800 32px "PingFang SC",sans-serif';
-  ctx.fillText("💌 想我指数", 110, y + 56);
-  ctx.fillStyle = a.color; ctx.font = '900 64px "PingFang SC",sans-serif';
-  ctx.textAlign = "right"; ctx.fillText(r.missIndex + "%", W - 100, y + 100);
+  ctx.fillText("🔥 你最强烈的欲望", 110, y + 56);
+  ctx.fillStyle = "#6f6677"; ctx.font = '700 30px "PingFang SC",sans-serif';
+  ctx.fillText(`${topD.emoji} ${topD.name}`, 110, y + 106);
+  ctx.fillStyle = topD.color; ctx.font = '900 58px "PingFang SC",sans-serif';
+  ctx.textAlign = "right"; ctx.fillText(topD.pct + "%", W - 100, y + 102);
   ctx.textAlign = "left";
 
   // 底部

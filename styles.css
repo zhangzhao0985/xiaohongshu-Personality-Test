@@ -187,6 +187,12 @@ body {
 .card-hidden { background: linear-gradient(135deg,#1f1830,#3a2e54); color: #fff; border: none; }
 .card-hidden .card-p { color: #e8e0ff; }
 .card-miss { background: linear-gradient(135deg,#fff,#fff0f4); border-color: #ffd9e2; }
+.card-top { background: linear-gradient(135deg,#fff,#fff0f4); border-color: #ffd9e2; }
+.top-head { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+.top-head .top-emoji { font-size: 26px; line-height: 1; }
+.top-head .top-name { font-size: 17px; font-weight: 800; }
+.top-head .top-pct { margin-left: auto; font-size: 22px; font-weight: 900; color: var(--xhs); }
+.card-top .miss-meter { margin-bottom: 12px; }
 .card-note { background: linear-gradient(135deg,#fffaf0,#fff5f6); border-color: #ffe6c9; }
 .card-note .card-p { white-space: pre-line; }
 

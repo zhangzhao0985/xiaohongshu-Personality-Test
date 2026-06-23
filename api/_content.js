@@ -25,6 +25,7 @@ const DESIRES = {
 const KEYS = ["love", "thing", "food", "own", "peek", "power", "shine", "free"];
 // 平分时谁优先当“最强属性”（保证结果稳定可复现）
 const TIE_PRIORITY = ["love", "own", "shine", "power", "peek", "food", "thing", "free"];
+const LOVE_FLOOR = 30; // 爱欲百分比最低值：人人都有爱欲，永远不会显示为 0
 
 /* ---------- 8 种「属性」（结果页顶部 + 完整分析） ----------
    每条 analysis 都不少于 400 字。\n 代表分段。 */
@@ -153,6 +154,18 @@ const PROFILES = {
     miss: "你向往远方，却也总会为某个人、某个瞬间停留。希望我这里，能成为你愿意偶尔回来的一站。",
     bless: "愿你飞向想去的远方，也总有想要停留的温柔。",
   },
+};
+
+/* ---------- 每种欲望「是什么」的解释（结果页「你最强烈的欲望」卡片用） ---------- */
+const DESIRE_EXPLAIN = {
+  love: "爱欲，是你心里最柔软、也最有力量的部分——渴望亲密、渴望被偏爱，也愿意认真地去爱。它从来不是软弱，而是一个人最珍贵的温度。每个人心里都住着爱欲，它让我们彼此靠近，也让人性显得格外美好。",
+  thing: "物欲，是你对美好生活最直接的向往——你对质感、设计、精致有敏锐的感知，也舍得为喜欢的东西买单。它代表你不肯将就，愿意用一件件心爱之物，把平凡的日子过成自己想要的模样。",
+  food: "食欲，是你最踏实的快乐来源——再难的一天，一口热乎好吃的就能救回来。它代表你懂得用最朴素的方式照顾自己，把生活过得有滋有味、人间值得，这是一种很高级的生活智慧。",
+  own: "占有欲，是你深情的另一种样子——你认定了，就想牢牢留在身边。它不是自私，而是一种几乎不留余地的认真：正因为太在乎，才舍不得把它分给任何人。",
+  peek: "窥探欲，是你与生俱来的好奇与敏锐——你总忍不住想多看世界一眼，对人和关系有着超乎常人的洞察。它代表你心思细腻、观察力惊人，是个安静又通透的「读心者」。",
+  power: "掌控欲，是你内心对安全感的追求——你习惯把方向盘握在自己手里，做事有计划、有担当。它代表你独立、果断、扛得住事，是身边人遇事时第一个想依靠的那个人。",
+  shine: "表现欲，是你想要发光的勇气——你渴望被看见、被认可，也愿意为此认真打磨自己。它不是虚荣，而是一种健康的自我肯定：你知道自己身上有光，也希望这束光被世界看见。",
+  free: "自由欲，是你灵魂里对辽阔的向往——你最怕被困住，需要选择的余地和呼吸的空间。它代表你独立洒脱、忠于自己，永远朝着更远、更自由的地方走。",
 };
 
 /* —— 20 道题：每题 4 个选项，均匀覆盖 8 大欲望（每种欲望各出现 10 次）。
@@ -295,6 +308,14 @@ function getClientQuiz() {
   };
 }
 
+/* 统计每种欲望在 20 道题里一共出现过多少次（用作「强度」的分母：
+   选它的次数 ÷ 出现次数 = 这种欲望的强度，于是各项百分比相互独立、合计可超过 100%） */
+const APPEAR = (() => {
+  const a = {}; KEYS.forEach((k) => (a[k] = 0));
+  QUESTIONS.forEach((it) => it.o.forEach((o) => a[o.k]++));
+  return a;
+})();
+
 /* —— 计分：传入每题选中的 optionId 数组，后端算出完整结果 —— */
 function computeResult(answerIds) {
   if (!Array.isArray(answerIds) || answerIds.length !== QUESTIONS.length) {
@@ -317,24 +338,29 @@ function computeResult(answerIds) {
   });
   if (seen.size !== QUESTIONS.length) throw new Error("有题目未作答");
 
-  const totalPicks = KEYS.reduce((s, k) => s + count[k], 0) || 1;
+  // 每种欲望的强度 = 选它的次数 / 它出现的次数（0~100%，各项独立、合计可超过 100%）
   const pct = {};
-  KEYS.forEach((k) => (pct[k] = Math.round((count[k] / totalPicks) * 100)));
+  KEYS.forEach((k) => (pct[k] = Math.round((count[k] / (APPEAR[k] || 1)) * 100)));
+  // 爱欲永远不为 0：人人都有爱欲，这份测试想让你看见人性里的柔软与美好
+  pct.love = Math.max(pct.love, LOVE_FLOOR);
 
-  // 8 大欲望从强到弱排序（平分用 TIE_PRIORITY 决定先后，结果稳定可复现）
+  // 「属性」由真实选择最多的欲望决定（平分用 TIE_PRIORITY，结果稳定可复现）
   const ranked = KEYS.slice().sort((a, b) =>
     count[b] !== count[a] ? count[b] - count[a]
       : TIE_PRIORITY.indexOf(a) - TIE_PRIORITY.indexOf(b));
-  const dominant = ranked[0];   // 最强欲望 → 决定你的「属性」
+  const dominant = ranked[0];   // 最强欲望 → 你的「属性」，也是百分比最高的欲望
   const second = ranked[1];     // 次强欲望 → 你的隐藏面
 
   const meta = (k) => ({ key: k, name: DESIRES[k].name, emoji: DESIRES[k].emoji, color: DESIRES[k].color });
   const attr = ATTRIBUTES[dominant];
   const domP = PROFILES[dominant];
 
-  // 想我指数：爱欲 / 占有欲越强，越「想我」（保持原有手感）
-  const missIndex = Math.max(66, Math.min(99,
-    Math.round(64 + pct.love * 0.30 + pct.own * 0.10 + pct.shine * 0.05)));
+  // 光谱按百分比从高到低展示（平分再看真实次数、再看优先级），最强的排最上面
+  const spectrum = KEYS.slice().sort((a, b) =>
+    pct[b] !== pct[a] ? pct[b] - pct[a]
+      : count[b] !== count[a] ? count[b] - count[a]
+        : TIE_PRIORITY.indexOf(a) - TIE_PRIORITY.indexOf(b))
+    .map((k) => ({ ...meta(k), pct: pct[k] }));
 
   return {
     // 顶部：你的属性
@@ -348,16 +374,20 @@ function computeResult(answerIds) {
       analysis: attr.analysis,   // 光谱下方 400+ 字完整分析
       traits: domP.traits,
     },
-    // 欲望光谱：8 大欲望全部返回（前端至少展示 6 个，这里给满 8 个）
-    spectrum: ranked.map((k) => ({ ...meta(k), pct: pct[k] })),
+    // 欲望光谱：8 大欲望全部返回，按百分比从高到低
+    spectrum,
     // 隐藏面：次强欲望
     hidden: {
       title: `🫣 你的隐藏面：${DESIRES[second].emoji} ${DESIRES[second].name}`,
       desc: `在你最强的「${DESIRES[dominant].name}」背后，还悄悄藏着第二种渴望——${DESIRES[second].name}。${PROFILES[second].teaser}`,
       traits: PROFILES[second].traits,
     },
-    missIndex,
-    missLine: domP.miss,
+    // 你最强烈的欲望（百分比最高）+ 这种欲望是什么
+    topDesire: {
+      ...meta(dominant),
+      pct: pct[dominant],
+      desc: DESIRE_EXPLAIN[dominant],
+    },
     zhaoNote: `${domP.bless}\n\n${ZHAO_TAIL}`,
   };
 }
